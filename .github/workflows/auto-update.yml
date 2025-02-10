@@ -1,0 +1,21 @@
+name: Auto-Update on PRs
+on:
+  push:
+    branches: 
+      - "!release" # Run on PR pushes to release branch
+      - "main" # Do not run on PRs with base main
+  schedule: # add schedule for edge case where it is not updated from pushes
+    - cron: '0,10,20,30,40,50 8-18 * * 1-5'
+    - cron: '5,15,25,35,45,55 8-18 * * 1-5'
+jobs:
+  auto-update-pr:
+    name: autoupdate
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: docker://chinthakagodawita/autoupdate-action:v1
+        env:
+          DRY_RUN: "true"
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          PR_FILTER: "auto_merge,protected"
+          PR_READY_STATE: "ready_for_review" # drafts will be ignored
+          MERGE_MSG: "Branch was auto-updated via GH Action"
